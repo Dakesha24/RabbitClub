@@ -1,0 +1,158 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Rabbit Club</title>
+        <link href="assets/fonts/fontawesome/css/all.min.css" rel="stylesheet">
+        <link href="style.css" rel="stylesheet">
+        <script type="text/javascript" src="/eel.js"></script>
+    </head>
+    <body>
+        <div class="video-matte color-burn">
+            <img src="assets/images/matte.png" alt="video-matte">
+        </div>
+        <div class="video-foreground overlay">
+            <img src="assets/videos/raylight.gif" alt="Foreground Animation">
+        </div>
+        <div class="about-section">
+            <img src="assets/images/about.png" alt="Logo" class="about-logo" id="aboutLogo">
+            <div class="about-popup" id="aboutPopup">
+                <div class="about-content">
+                    <button class="close-btn" id="closeAbout">&times;</button>
+                    <h2>About Rabbit Club</h2>
+                    <div class="about-info">
+                        <h3>🤖 What is Rabbit Club?</h3>
+                        <p>Rabbit Club adalah teman virtual yang dirancang untuk menemani dan membantu mengatasi kesepian. Dengan kemampuan chat dan voice interaction, asisten ini memberikan pengalaman komunikasi yang natural dan personal.</p>
+                        
+                        <h3>✨ Features</h3>
+                        <ul>
+                            <li>Real-time text chat</li>
+                            <li>Voice interaction</li>
+                            <li>Natural conversation flow</li>
+                            <li>24/7 availability</li>
+                        </ul>
+                        
+        
+                        <h3>👥 Credits</h3>
+                        <div class="credits-section">
+                            <h3>👥 Credits</h3>
+                            <div class="credits-team">
+                                <div class="credit-item">
+                                    <strong>Lukman Nurkasih</strong>
+                                    <p>Project Leader, Background Compositor, Backend Programmer, Researcher</p>
+                                </div>
+                                <div class="credit-item">
+                                    <strong>Naufal Ahandi</strong>
+                                    <p>Storyboard Artist</p>
+                                </div>
+                                <div class="credit-item">
+                                    <strong>Imel Pebriani</strong>
+                                    <p>Background Artist</p>
+                                </div>
+                                <div class="credit-item">
+                                    <strong>Amelia Pardiana Putri</strong>
+                                    <p>Character Design, Character Animator</p>
+                                </div>
+                                <div class="credit-item">
+                                    <strong>Danis Keysara Saputra</strong>
+                                    <p>Frontend Developer, Backend Support</p>
+                                </div>
+                            </div>
+
+                            <img src="./assets/images/logo-ftv.webp" style="max-width: 400px;" alt="">
+                            
+                            <p>Version 1.0.0</p>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="history-popup" id="historyPopup">
+                <div class="history-content">
+                    <button class="close-btn" id="closeHistory">&times;</button>
+                    <h2>Chat History</h2>
+                    <div class="history-messages" id="historyMessages">
+                        <!-- History messages will be shown here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-button" id="historyBtn">
+            <i class="fas fa-history"></i>
+        </div>
+        
+        <div class="fullscreen-button" id="fullscreenBtn">
+            <i class="fas fa-expand" id="fullscreenIcon"></i>
+        </div>
+
+        <div class="logo-button" >
+            <i class="fas fa-expand logo-button">
+                <img class="logo-button" src="./assets/images/logo-ftv.webp" alt="">
+            </i>
+        </div>
+
+    <div class="container">
+        <div class="chat-container">
+            <div class="loading-indicator" id="loadingIndicator">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be inserted here -->
+            </div>
+            
+            <div class="input-container">
+                <textarea 
+                    id="messageInput" 
+                    placeholder="Type your message here..."
+                    rows="1"
+                ></textarea>
+                
+                <div class="button-group">
+                    <button id="voiceInputBtn" class="icon-button">
+                        <img src="assets/images/mic-icon.png" alt="Voice Input" class="icon-image">
+                    </button>
+
+                    <!-- <button id="stopRecordingBtn" class="btn type2" style="display: none;">
+                        <span class="pulse-ring"></span>
+                        ⏹️
+                    </button> -->
+
+                    <button id="stopRecordingBtn" class="btn type2" style="display: none;">
+                        <span class="pulse-ring"></span>
+                        <img src="assets/images/stop-say-icon.png" alt="Stop Recording" class="icon-image-stop-button">
+                    </button>
+                    
+                    <button id="sendMessageBtn" class="icon-button">
+                        <img src="assets/images/input-icon.png" alt="Send Message" class="icon-image">
+                    </button>
+                </div>                
+            </div>
+        </div>
+    </div>
+
+    <div class="recording-indicator" id="recordingIndicator">
+        <div class="recording-wave">
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+        </div>
+    </div>
+
+    <div class="character-container" id="characterContainer">
+        <div class="character-layer">
+            <img src="assets/character/idle/idle.gif" alt="Character" class="character-image" id="characterImage">
+        </div>
+        <div class="mouth-layer">
+            <img src="assets/character/idle/closedmouth.png" alt="Mouth" class="mouth-image" id="mouthImage">
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lip Sync Animation</title>
+    <style>
+        #mouthImage {
+            width: 200px;
+            height: 200px;
+        }
+        #audioUpload {
+            margin-top: 20px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #container {
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+        }
+
+        #mouth {
+            width: 100px;
+            height: 100px;
+        }
+
+        #mouth img {
+            width: 100%;
+            height: auto;
+        }
+
+        audio {
+            margin-top: 30px;
+        }
+
+        input[type="file"] {
+            margin-top: 20px;
+            padding: 5px;
+            font-size: 16px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Lip Sync Animation</h1>
+    <input type="file" id="audioUpload" accept="audio/*">
+    <br>
+    <img id="mouthImage" src="images/closedmouth.png" alt="Mouth Animation">
+    
+    <!-- Pemutar audio (untuk visualisasi audio) -->
+    <audio id="audioPlayer" controls>
+        <source id="audioSource" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // Ambil elemen DOM yang diperlukan
+        const mouthImage = document.getElementById("mouthImage");
+        const audioUpload = document.getElementById("audioUpload");
+        const audioPlayer = document.getElementById("audioPlayer");
+
+        // Variabel untuk menangani audio
+        let audioContext;
+        let analyser;
+        let javascriptNode;
+        let audioSourceNode;
+        let audioBuffer;
+        let audioPlaying = false; // Flag untuk mengecek status pemutaran audio
+
+        let lastAmplitude = 0; // Untuk menyimpan amplitudo sebelumnya
+        let mouthState = "closed"; // Menyimpan status mulut (terbuka atau tertutup)
+        let mouthAnimationSpeed = 20; // Kecepatan animasi mulut dalam milidetik (lebih kecil lebih cepat)
+        let lastMouthChange = Date.now(); // Waktu terakhir mulut berubah
+
+        // Fungsi untuk memproses dan menganalisis file audio
+        async function processAudio(file) {
+            const reader = new FileReader();
+            reader.onload = async function(event) {
+                // Membuat AudioContext baru untuk memproses file audio
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const arrayBuffer = event.target.result;
+
+                // Memuat file audio ke dalam buffer
+                audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+                // Menyambungkan buffer audio dengan AnalyserNode
+                audioSourceNode = audioContext.createBufferSource();
+                audioSourceNode.buffer = audioBuffer;
+
+                // Membuat AnalyserNode untuk menganalisis gelombang audio
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;  // Ukuran FFT menentukan resolusi analisis
+                audioSourceNode.connect(analyser);
+                analyser.connect(audioContext.destination);
+
+                // Menghubungkan ke AudioContext agar dapat diputar
+                audioSourceNode.connect(audioContext.destination);
+
+                // Mulai memainkan audio setelah pemuatan file selesai
+                audioSourceNode.start();
+
+                // Tampilkan audio di player untuk kontrol
+                audioPlayer.src = URL.createObjectURL(file); // Set audio source dari file yang diunggah
+                audioPlayer.load();  // Memuat file audio
+                // Tidak otomatis memulai pemutaran, harus menggunakan tombol play di player
+
+                audioPlaying = true; // Set flag audioPlaying menjadi true
+                // Mulai menganalisis dan mengubah gambar bibir
+                startAnalyzingAudio();
+            };
+
+            // Membaca file sebagai array buffer
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Fungsi untuk menganalisis audio dan menyesuaikan animasi bibir
+        function startAnalyzingAudio() {
+            // Membuat ScriptProcessorNode untuk menganalisis data audio secara real-time
+            javascriptNode = audioContext.createScriptProcessor(2048, 1, 1); // Ukuran buffer lebih kecil untuk analisis cepat
+            javascriptNode.connect(audioContext.destination);
+            analyser.connect(javascriptNode);
+
+            // Mendapatkan data frekuensi dan amplitudo untuk setiap frame audio
+            javascriptNode.onaudioprocess = function() {
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                analyser.getByteFrequencyData(dataArray);
+
+                // Menghitung amplitudo rata-rata dari data frekuensi
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    sum += dataArray[i];
+                }
+
+                let averageAmplitude = sum / dataArray.length;
+
+                // Tentukan gambar bibir dan kecepatan animasi berdasarkan amplitudo dan kecepatan perubahan suara
+                const now = Date.now();
+
+                // Periksa apakah cukup waktu telah berlalu untuk memperbarui animasi
+                if (now - lastMouthChange > mouthAnimationSpeed) {
+                    if (averageAmplitude > lastAmplitude) {
+                        // Jika amplitudo meningkat (suara lebih keras), buka mulut lebih cepat
+                        mouthImage.src = "images/openmouth.png"; 
+                        mouthState = "open"; // Status mulut menjadi terbuka
+                    } else if (averageAmplitude < lastAmplitude) {
+                        // Jika amplitudo menurun (suara berhenti), tutup mulut lebih cepat
+                        mouthImage.src = "images/closedmouth.png"; 
+                        mouthState = "closed"; // Status mulut menjadi tertutup
+                    }
+
+                    // Jika amplitudo sangat rendah, pastikan mulut cepat tertutup
+                    if (averageAmplitude < 20 && mouthState === "open") {
+                        mouthImage.src = "images/closedmouth.png";
+                        mouthState = "closed"; 
+                    }
+
+                    // Menyimpan waktu terakhir mulut berubah untuk memberikan delay animasi
+                    lastMouthChange = now;
+                }
+
+                // Menyimpan amplitudo untuk analisis selanjutnya
+                lastAmplitude = averageAmplitude;
+            };
+        }
+
+        // Fungsi untuk menangani upload file audio
+        audioUpload.addEventListener('change', function(event) {
+            const file = event.target.files[0]; // Ambil file yang diupload
+            if (file) {
+                processAudio(file); // Proses file audio yang diunggah
+                audioPlayer.play(); // Memulai pemutaran audio setelah file diproses
+            }
+        });
+
+    </script>
+</body>
+</html>
